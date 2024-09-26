@@ -13,13 +13,11 @@ class TennisGameFactory extends Factory
     public function definition(): array
     {
         return [
-            'player1_name' => $this->faker->name,
-            'player2_name' => $this->faker->name,
+            'player1_name' => fake()->firstName(),
+            'player2_name' => fake()->firstName(),
             'player1_points' => 0,
             'player2_points' => 0,
             'current_player' => 'player1',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
         ];
     }
 }
