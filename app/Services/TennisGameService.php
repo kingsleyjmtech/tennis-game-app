@@ -18,8 +18,12 @@ class TennisGameService
     /**
      * Get the current score in tennis terms.
      */
-    public function getScore(): string
+    public function scoreboard(): string
     {
+        if ($this->tennisGame->winner) {
+            return 'Won by ' . $this->tennisGame->winner;
+        }
+
         if ($this->tennisGame->player1_points == $this->tennisGame->player2_points) {
             return $this->equalScore();
         }
@@ -28,7 +32,7 @@ class TennisGameService
             return $this->advantageOrWin();
         }
 
-        return $this->pointName($this->tennisGame->player1_points) . ' - ' . $this->pointName($this->tennisGame->player2_points);
+        return $this->pointName($this->tennisGame->player1_points) . '-' . $this->pointName($this->tennisGame->player2_points);
     }
 
     /**
@@ -54,10 +58,10 @@ class TennisGameService
             return "Advantage " . $this->tennisGame->player2_name;
         } elseif ($score_diff >= 2) {
             $this->tennisGame->update(['winner' => $this->tennisGame->player1_name]);
-            return $this->tennisGame->player1_name . " Wins";
+            return "Won by " . $this->tennisGame->player1_name;
         }
         $this->tennisGame->update(['winner' => $this->tennisGame->player2_name]);
-        return $this->tennisGame->player2_name . " Wins";
+        return "Won by " . $this->tennisGame->player2_name;
     }
 
     /**
@@ -70,6 +74,40 @@ class TennisGameService
     }
 
     /**
+     * Check if the game is complete.
+     */
+    public function isComplete(): bool
+    {
+        return (bool)$this->tennisGame->winner;
+    }
+
+    /**
+     * Player 1 scores a point.
+     * @throws Exception
+     */
+    public function player1Point(): void
+    {
+        if ($this->isComplete()) {
+            throw new Exception('Game is already over.');
+        }
+
+        $this->updateScore('player1', 1);
+    }
+
+    /**
+     * Player 2 scores a point.
+     * @throws Exception
+     */
+    public function player2Point(): void
+    {
+        if ($this->isComplete()) {
+            throw new Exception('Game is already over.');
+        }
+
+        $this->updateScore('player2', 1);
+    }
+
+    /**
      * Update the score for the given player and switch the current player.
      * @throws Exception
      */
@@ -79,7 +117,8 @@ class TennisGameService
             throw new Exception('Game is already over.');
         }
 
-        if (!in_array($increment, [0, 1])) {
+        // Validate that the increment is either 0 or 1
+        if (!in_array($increment, [0, 1], true)) {
             throw new InvalidArgumentException('Increment must be either 0 or 1.');
         }
 
@@ -93,11 +132,7 @@ class TennisGameService
         }
 
         // Switch the current player
-        if ($player === 'player1') {
-            $this->tennisGame->current_player = 'player2'; // Switch to Player 2's turn
-        } elseif ($player === 'player2') {
-            $this->tennisGame->current_player = 'player1'; // Switch to Player 1's turn
-        }
+        $this->tennisGame->current_player = $player === 'player1' ? 'player2' : 'player1';
 
         $this->tennisGame->save();
     }
@@ -112,9 +147,14 @@ class TennisGameService
             throw new Exception('It is not Player 1’s turn.');
         }
 
+        // Player 1 scores a random point (either 0 or 1)
         $increment = rand(0, 1);
 
-        $this->updateScore(player: $this->getCurrentPlayer(), increment: $increment);
+        if ($increment === 1) {
+            $this->player1Point();
+        } else {
+            $this->updateScore('player1', $increment); // Still switch the player even if no point is added
+        }
     }
 
     /**
@@ -127,9 +167,14 @@ class TennisGameService
             throw new Exception('It is not Player 2’s turn.');
         }
 
+        // Player 2 scores a random point (either 0 or 1)
         $increment = rand(0, 1);
 
-        $this->updateScore(player: $this->getCurrentPlayer(), increment: $increment);
+        if ($increment === 1) {
+            $this->player2Point();
+        } else {
+            $this->updateScore('player2', $increment); // Still switch the player even if no point is added
+        }
     }
 
     /**

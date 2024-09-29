@@ -16,7 +16,7 @@ beforeEach(function () {
 });
 
 it('initializes the game with Love All', function () {
-    $score = $this->service->getScore();
+    $score = $this->service->scoreboard();
     expect($score)->toBe('Love All');
 });
 
@@ -31,7 +31,7 @@ it('updates player 1 score correctly when incremented', function () {
 
     expect($this->tennisGame->player1_points)->toBe(1)
         ->and($this->tennisGame->current_player)->toBe('player2')
-        ->and($this->service->getScore())->toBe('Fifteen - Love');
+        ->and($this->service->scoreboard())->toBe('Fifteen-Love');
 });
 
 it('updates player 2 score correctly when incremented', function () {
@@ -40,14 +40,14 @@ it('updates player 2 score correctly when incremented', function () {
 
     expect($this->tennisGame->player2_points)->toBe(1)
         ->and($this->tennisGame->current_player)->toBe('player1')
-        ->and($this->service->getScore())->toBe('Love - Fifteen');
+        ->and($this->service->scoreboard())->toBe('Love-Fifteen');
 });
 
 it('correctly handles deuce situation', function () {
     $this->tennisGame->player1_points = 3;
     $this->tennisGame->player2_points = 3;
 
-    $score = $this->service->getScore();
+    $score = $this->service->scoreboard();
 
     expect($score)->toBe('Deuce');
 });
@@ -56,7 +56,7 @@ it('handles advantage for player 1', function () {
     $this->tennisGame->player1_points = 4;
     $this->tennisGame->player2_points = 3;
 
-    $score = $this->service->getScore();
+    $score = $this->service->scoreboard();
 
     expect($score)->toBe('Advantage Player 1');
 });
@@ -65,16 +65,16 @@ it('handles win for player 1', function () {
     $this->tennisGame->player1_points = 5;
     $this->tennisGame->player2_points = 3;
 
-    $score = $this->service->getScore();
+    $score = $this->service->scoreboard();
 
-    expect($score)->toBe('Player 1 Wins');
+    expect($score)->toBe('Won by Player 1');
 });
 
 it('handles advantage for player 2', function () {
     $this->tennisGame->player1_points = 3;
     $this->tennisGame->player2_points = 4;
 
-    $score = $this->service->getScore();
+    $score = $this->service->scoreboard();
 
     expect($score)->toBe('Advantage Player 2');
 });
@@ -83,9 +83,9 @@ it('handles win for player 2', function () {
     $this->tennisGame->player1_points = 3;
     $this->tennisGame->player2_points = 5;
 
-    $score = $this->service->getScore();
+    $score = $this->service->scoreboard();
 
-    expect($score)->toBe('Player 2 Wins');
+    expect($score)->toBe('Won by Player 2');
 });
 
 it('updates player 1 score randomly (0 or 1 increment)', function () {
@@ -112,7 +112,34 @@ it('correctly handles tied score below deuce', function () {
     $this->tennisGame->player1_points = 1;
     $this->tennisGame->player2_points = 1;
 
-    $score = $this->service->getScore();
+    $score = $this->service->scoreboard();
 
     expect($score)->toBe('Fifteen All');
 });
+
+it('player 1 plays and scores randomly', function () {
+    $this->service->playerOnePlay();
+    $this->tennisGame->refresh();
+
+    expect($this->tennisGame->current_player)->toBe('player2');
+    expect($this->tennisGame->player1_points <= 1)->toBeTrue();
+});
+
+it('player 2 plays and scores randomly', function () {
+    $this->tennisGame->current_player = 'player2';
+    $this->service->playerTwoPlay();
+    $this->tennisGame->refresh();
+
+    expect($this->tennisGame->current_player)->toBe('player1');
+    expect($this->tennisGame->player2_points <= 1)->toBeTrue();
+});
+
+it('throws exception if player 1 plays when it is not their turn', function () {
+    $this->tennisGame->current_player = 'player2';
+    $this->service->playerOnePlay();
+})->throws(Exception::class, 'It is not Player 1’s turn.');
+
+it('throws exception if player 2 plays when it is not their turn', function () {
+    $this->tennisGame->current_player = 'player1';
+    $this->service->playerTwoPlay();
+})->throws(Exception::class, 'It is not Player 2’s turn.');
