@@ -43,3 +43,18 @@ This is a Tennis Game App written in Laravel 11.
    ```sh
    php artisan test
    ```
+
+## Screenshots
+![Screenshot 1](screenshot 1.png)
+![Screenshot 2](screenshot 2.png)
+![Screenshot 3](screenshot 3.png)
+![Screenshot 4](screenshot 4.png)
+![Screenshot 5](screenshot 5.png)
+![Screenshot 6](screenshot 6.png)
+![Screenshot 7](screenshot 7.png)
+![Screenshot 8](screenshot 8.png)
+![Screenshot 9](screenshot 9.png)
+![Screenshot 10](screenshot 10.png)
+![Screenshot 11](screenshot 11.png)
+
+
