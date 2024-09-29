@@ -17,11 +17,34 @@ class TennisGame extends Component
 
     public function mount(): void
     {
+        $this->createNewGame();
+    }
+
+    /**
+     * Create a new game and reset the state.
+     */
+    public function createNewGame(): void
+    {
         $this->tennisGame = TennisGameModel::query()->create([
             'player1_name' => 'Player 1',
             'player2_name' => 'Player 2',
             'player1_points' => 0,
             'player2_points' => 0,
+        ]);
+
+        $this->updateGameState();
+    }
+
+    /**
+     * Reset the current game to its initial state.
+     */
+    public function resetGame(): void
+    {
+        $this->tennisGame->update([
+            'player1_points' => 0,
+            'player2_points' => 0,
+            'winner' => null,
+            'current_player' => 'player1',
         ]);
 
         $this->updateGameState();

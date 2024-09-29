@@ -28,9 +28,24 @@
                     Player 2 Scores
                 </button>
             </div>
+
+            <div class="text-center mt-4">
+                <button
+                    wire:click="resetGame"
+                    class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mt-4"
+                >
+                    Reset Game
+                </button>
+            </div>
         @else
             <div class="text-center mt-4">
                 <p class="text-lg font-semibold text-red-500">Game Over! {{ $tennisGame->winner }} is the winner.</p>
+                <button
+                    wire:click="createNewGame"
+                    class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mt-4"
+                >
+                    Start New Game
+                </button>
             </div>
         @endif
     </div>
