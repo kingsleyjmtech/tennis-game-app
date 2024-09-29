@@ -73,7 +73,7 @@ class TennisGame extends Component
     public function updateGameState(): void
     {
         $service = new TennisGameService($this->tennisGame);
-        $this->score = $service->getScore();
+        $this->score = $service->scoreboard();
         $this->currentPlayer = $service->getCurrentPlayer();
     }
 

@@ -39,7 +39,7 @@
             </div>
         @else
             <div class="text-center mt-4">
-                <p class="text-lg font-semibold text-red-500">Game Over! {{ $tennisGame->winner }} is the winner.</p>
+                <p class="text-lg font-semibold text-red-500">Game Over! {{ $score }}</p>
                 <button
                     wire:click="createNewGame"
                     class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mt-4"
