@@ -70,7 +70,7 @@ class TennisGameService
     }
 
     /**
-     * Update the score for the given player.
+     * Update the score for the given player and switch the current player.
      * @throws Exception
      */
     public function updateScore(string $player, int $increment): void
@@ -83,17 +83,53 @@ class TennisGameService
             throw new InvalidArgumentException('Increment must be either 0 or 1.');
         }
 
+        // Update the points for the current player
         if ($increment === 1) {
             if ($player === 'player1') {
                 $this->tennisGame->player1_points += 1;
-                $this->tennisGame->current_player = 'player2'; // Switch to Player 2's turn
             } elseif ($player === 'player2') {
                 $this->tennisGame->player2_points += 1;
-                $this->tennisGame->current_player = 'player1'; // Switch to Player 1's turn
             }
         }
 
+        // Switch the current player
+        if ($player === 'player1') {
+            $this->tennisGame->current_player = 'player2'; // Switch to Player 2's turn
+        } elseif ($player === 'player2') {
+            $this->tennisGame->current_player = 'player1'; // Switch to Player 1's turn
+        }
+
         $this->tennisGame->save();
+    }
+
+    /**
+     * Function to handle the play for player 1, if it's their turn.
+     * @throws Exception
+     */
+    public function playerOnePlay(): void
+    {
+        if ($this->tennisGame->current_player !== 'player1') {
+            throw new Exception('It is not Player 1’s turn.');
+        }
+
+        $increment = rand(0, 1);
+
+        $this->updateScore(player: $this->getCurrentPlayer(), increment: $increment);
+    }
+
+    /**
+     * Function to handle the play for player 2, if it's their turn.
+     * @throws Exception
+     */
+    public function playerTwoPlay(): void
+    {
+        if ($this->tennisGame->current_player !== 'player2') {
+            throw new Exception('It is not Player 2’s turn.');
+        }
+
+        $increment = rand(0, 1);
+
+        $this->updateScore(player: $this->getCurrentPlayer(), increment: $increment);
     }
 
     /**
